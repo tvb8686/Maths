@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星空加法挑戰 🌌</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&family=Noto+Sans+TC:wght@500;700&display=swap');
+
+        :root {
+            /* 深色時尚配色 */
+            --bg-dark: #1a1c2c;
+            --card-bg: #292d3e;
+            --primary-glow: #bd93f9; /* 夢幻紫 */
+            --secondary-glow: #8be9fd; /* 湖水藍 */
+            --accent-pink: #ff79c6;
+            --text-light: #f8f8f2;
+        }
+
+        body {
+            font-family: 'Quicksand', 'Noto Sans TC', sans-serif;
+            background: radial-gradient(circle at center, #2d3436 0%, #1a1c2c 100%);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-light);
+        }
+
+        .game-card {
+            background: var(--card-bg);
+            border-radius: 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 650px;
+            padding: 50px 40px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .score-board {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 20px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            color: var(--secondary-glow);
+            border: 1px solid var(--secondary-glow);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            color: var(--primary-glow);
+            text-shadow: 0 0 10px rgba(189, 147, 249, 0.5);
+        }
+
+        /* 視覺計數區 - 深色容器 */
+        .visual-area {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 30px;
+            padding: 30px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            min-height: 100px;
+        }
+
+        .fruit {
+            font-size: 3.2rem;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.2));
+            transition: transform 0.3s;
+        }
+
+        .divider {
+            width: 3px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0 15px;
+            border-radius: 10px;
+        }
+
+        /* 數學算式區 */
+        .math-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            font-size: 4.5rem;
+        }
+
+        .num-box {
+            color: var(--secondary-glow);
+            font-weight: 700;
+            text-shadow: 0 0 15px rgba(139, 233, 253, 0.3);
+        }
+
+        .symbol {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        input {
+            width: 130px;
+            height: 100px;
+            font-size: 3.5rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: var(--accent-pink);
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--accent-pink);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(255, 121, 198, 0.2);
+        }
+
+        /* 霓虹感按鈕 */
+        .check-btn {
+            background: transparent;
+            color: var(--primary-glow);
+            border: 2px solid var(--primary-glow);
+            padding: 18px 60px;
+            font-size: 1.8rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 40px;
+            transition: all 0.3s ease;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .check-btn:hover {
+            background: var(--primary-glow);
+            color: var(--bg-dark);
+            box-shadow: 0 0 30px rgba(189, 147, 249, 0.4);
+        }
+
+        #feedback {
+            margin-top: 30px;
+            font-size: 1.6rem;
+            min-height: 40px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-card">
+    <div class="score-board">✨ Points: <span id="score">0</span></div>
+    <h1>數學</h1>
+
+    <div class="visual-area" id="visual-area"></div>
+
+    <div class="math-display">
+        <div id="n1" class="num-box">0</div>
+        <div class="symbol">+</div>
+        <div id="n2" class="num-box">0</div>
+        <div class="symbol">=</div>
+        <input type="number" id="user-input" placeholder="?" inputmode="numeric">
+    </div>
+
+    <button class="check-btn" onclick="checkAnswer()">Check Answer</button>
+    <div id="feedback"></div>
+</div>
+
+<script>
+    let score = 0, n1, n2;
+    // 使用亮色系的水果在暗背景下更出眾
+    const fruits = ['🍓', '🍑', '🍋', '🍐', '🫐', '🍒', '🍩'];
+    const successSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3'); // 輕快的鈴聲
+    const failSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');    // 提示音
+
+    function init() {
+        n1 = Math.floor(Math.random() * 5) + 1;
+        n2 = Math.floor(Math.random() * 5) + 1;
+        document.getElementById('n1').innerText = n1;
+        document.getElementById('n2').innerText = n2;
+        document.getElementById('user-input').value = '';
+        document.getElementById('feedback').innerText = '';
+        
+        const area = document.getElementById('visual-area');
+        const f = fruits[Math.floor(Math.random() * fruits.length)];
+        area.innerHTML = '';
+        
+        for(let i=0; i<n1; i++) area.innerHTML += `<span class="fruit">${f}</span>`;
+        area.innerHTML += `<div class="divider"></div>`;
+        for(let i=0; i<n2; i++) area.innerHTML += `<span class="fruit">${f}</span>`;
+    }
+
+    function checkAnswer() {
+        const val = parseInt(document.getElementById('user-input').value);
+        const fb = document.getElementById('feedback');
+        if(val === (n1 + n2)) {
+            successSound.play();
+            fb.innerText = "✨ Amazing! Heading to next star...";
+            fb.style.color = "#50fa7b"; // 明亮的綠色
+            score++;
+            document.getElementById('score').innerText = score;
+            setTimeout(init, 2000);
+        } else {
+            failSound.play();
+            fb.innerText = "Let's count the space treats!";
+            fb.style.color = "#ffb86c"; // 柔和的橘色
+        }
+    }
+    init();
+</script>
+
+</body>
+</html>
