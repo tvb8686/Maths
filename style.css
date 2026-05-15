@@ -32,6 +32,7 @@ header h1 {
     letter-spacing: 2px;
     text-transform: uppercase;
     -webkit-background-clip: text;
+    color:white
 }
 
 /* 网格布局 */
