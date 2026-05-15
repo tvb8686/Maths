@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>數字大比拼 - 拖拉版</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+            background-color: #fdfcf0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        h1 { color: #16a34a; margin-bottom: 20px; }
+
+        .game-container {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 4px solid #fde047;
+        }
+
+        .numbers-display {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            font-size: 5rem;
+            font-weight: bold;
+            margin-bottom: 40px;
+        }
+
+        .num-box {
+            min-width: 120px;
+            padding: 20px;
+            background: #dcfce7;
+            border-radius: 20px;
+            color: #15803d;
+        }
+
+        /* 放答案的框框 */
+        .symbol-slot {
+            width: 120px;
+            height: 120px;
+            border: 5px dashed #cbd5e1;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            transition: all 0.3s;
+        }
+
+        /* 拖拉中框框變色 */
+        .symbol-slot.drag-over {
+            border-color: #22c55e;
+            background-color: #f0fdf4;
+            transform: scale(1.1);
+        }
+
+        /* 可拖動的符號區域 */
+        .symbols-palette {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .draggable-symbol {
+            font-size: 3.5rem;
+            width: 90px;
+            height: 90px;
+            background: #22c55e;
+            color: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            user-select: none;
+            box-shadow: 0 4px 0 #16a34a;
+        }
+
+        .draggable-symbol:active { cursor: grabbing; }
+
+        #message {
+            margin-top: 30px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            height: 2.2rem;
+        }
+
+        .next-btn {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            padding: 10px 25px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🐊 把正確的嘴巴拖進格子裡！</h1>
+
+    <div class="game-container">
+        <div class="numbers-display">
+            <div id="numA" class="num-box">?</div>
+            <div id="targetSlot" class="symbol-slot" 
+                 ondragover="allowDrop(event)" 
+                 ondragleave="dragLeave(event)" 
+                 ondrop="drop(event)">?</div>
+            <div id="numB" class="num-box">?</div>
+        </div>
+
+        <p style="color: #64748b;">拖動下方的符號：</p>
+        
+        <div class="symbols-palette">
+            <div class="draggable-symbol" draggable="true" ondragstart="drag(event)" id="sym-lt">&lt;</div>
+            <div class="draggable-symbol" draggable="true" ondragstart="drag(event)" id="sym-eq">=</div>
+            <div class="draggable-symbol" draggable="true" ondragstart="drag(event)" id="sym-gt">&gt;</div>
+        </div>
+
+        <div id="message"></div>
+        <button id="nextBtn" class="next-btn" onclick="initGame()">下一題</button>
+    </div>
+
+    <script>
+        let valA, valB;
+        const correctSound = new Audio('https://cdn.pixabay.com/audio/2021/08/04/audio_0625c13f76.mp3');
+
+        function initGame() {
+            valA = Math.floor(Math.random() * 50) + 1;
+            valB = Math.floor(Math.random() * 50) + 1;
+
+            document.getElementById('numA').innerText = valA;
+            document.getElementById('numB').innerText = valB;
+            
+            const target = document.getElementById('targetSlot');
+            target.innerText = '?';
+            target.style.color = '#cbd5e1';
+            target.style.fontSize = '3rem';
+            
+            document.getElementById('message').innerText = '';
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        // 當開始拖動時，儲存符號內容
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.innerText);
+        }
+
+        // 允許放置
+        function allowDrop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.add('drag-over');
+        }
+
+        // 離開放置區時恢復原狀
+        function dragLeave(ev) {
+            ev.currentTarget.classList.remove('drag-over');
+        }
+
+        // 放下時觸發判斷
+        function drop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('drag-over');
+            
+            const playerChoice = ev.dataTransfer.getData("text");
+            checkAnswer(playerChoice);
+        }
+
+        function checkAnswer(choice) {
+            let correctSymbol;
+            if (valA > valB) correctSymbol = '>';
+            else if (valA < valB) correctSymbol = '<';
+            else correctSymbol = '=';
+
+            const messageEl = document.getElementById('message');
+            const target = document.getElementById('targetSlot');
+
+            if (choice === correctSymbol) {
+                correctSound.play();
+                target.innerText = choice;
+                target.style.color = '#ef4444';
+                target.style.fontSize = '5rem';
+                messageEl.innerText = "答對了！鱷魚吃飽了 🌟";
+                messageEl.style.color = "#16a34a";
+                document.getElementById('nextBtn').style.display = "inline-block";
+            } else {
+                messageEl.innerText = "哎呀，鱷魚不喜歡這個數字...再試試！";
+                messageEl.style.color = "#ef4444";
+                
+                // 答錯時晃動格子的視覺效果
+                target.style.borderColor = "#ef4444";
+                setTimeout(() => target.style.borderColor = "#cbd5e1", 500);
+            }
+        }
+
+        initGame();
+    </script>
+</body>
+</html>

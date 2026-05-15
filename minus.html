@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fruit Subtraction Adventure 🍓</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&display=swap');
+
+        :root {
+            --bg-deep: #1b1e33;
+            --purple-glow: #b794f4;
+            --cyan-glow: #81e6d9;
+            --font-main: 'Quicksand', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: radial-gradient(circle at center, #2a2f4c 0%, #161929 100%);
+            color: white;
+            font-family: var(--font-main);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 95%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            background: linear-gradient(to right, #ff79c6, #bd93f9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(255, 121, 198, 0.3);
+        }
+
+        .game-area {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            margin-bottom: 40px;
+        }
+
+        .cloud-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .cloud-wrapper {
+            position: relative;
+            min-width: 180px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .cloud-base {
+            position: absolute;
+            width: 100%;
+            height: 50px;
+            bottom: 0;
+            border-radius: 50px;
+            filter: blur(15px);
+            opacity: 0.7;
+            z-index: 1;
+        }
+
+        .purple { background: var(--purple-glow); box-shadow: 0 0 30px var(--purple-glow); }
+        .cyan { background: #ff79c6; box-shadow: 0 0 30px #ff79c6; } /* 減法用粉色強調「拿走」 */
+
+        .fruits {
+            z-index: 2;
+            font-size: 3.0rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .fruit-pop {
+            display: inline-block;
+            animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        .num-hint {
+            font-size: 5rem;
+            font-weight: 700;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            width: 55px;
+            height: 55px;
+            line-height: 55px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .minus-sign {
+            font-size: 3.5rem;
+            align-self: center;
+            margin-top: -50px;
+            color: #ff79c6;
+            text-shadow: 0 0 10px rgba(255, 121, 198, 0.5);
+        }
+
+        .input-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            font-size: 3rem;
+        }
+
+        input {
+            width: 120px;
+            height: 90px;
+            background: white;
+            border-radius: 20px;
+            border: 5px solid #ff79c6;
+            font-size: 3rem;
+            text-align: center;
+            font-family: inherit;
+            color: #1e293b;
+            outline: none;
+        }
+
+        .go-btn {
+            background: linear-gradient(180deg, #ff79c6 0%, #bd93f9 100%);
+            color: white;
+            padding: 15px 70px;
+            font-size: 1.8rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #6272a4;
+            margin-top: 30px;
+            font-family: inherit;
+            transition: 0.1s;
+        }
+
+        .go-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 3px 0 #6272a4;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        #feedback-text {
+            margin-top: 20px;
+            font-size: 1.4rem;
+            height: 30px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>減法</h1>
+
+    <div class="game-area">
+        <div class="cloud-section">
+            <div class="cloud-wrapper">
+                <div class="cloud-base purple"></div>
+                <div class="fruits" id="g1"></div>
+            </div>
+            <div class="num-hint" id="n1-text">0</div>
+        </div>
+
+        <div class="minus-sign">-</div>
+
+        <div class="cloud-section">
+            <div class="cloud-wrapper" style="animation-delay: -2s;">
+                <div class="cloud-base cyan"></div>
+                <div class="fruits" id="g2"></div>
+            </div>
+            <div class="num-hint" id="n2-text">0</div>
+        </div>
+    </div>
+
+    <div class="input-row">
+        <span style="color: #ff79c6;">=</span>
+        <input type="number" id="ans" placeholder="?" inputmode="numeric">
+    </div>
+
+    <button class="go-btn" onclick="check()">GO!</button>
+    <div id="feedback-text"></div>
+</div>
+
+<script>
+    let val1, val2;
+    const items = ['🍎', '🍓', '🍋', '🍐', '🫐', '🍒', '🍩'];
+    
+    const successSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3'); // 輕快的鈴聲
+    const soundWrong = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');    // 提示音
+
+    function refresh() {
+        // 確保 val1 永遠大於或等於 val2 (避免負數)
+        val1 = Math.floor(Math.random() * 10) + 4; // 4-10 之間
+        val2 = Math.floor(Math.random() * val1);  // 0 到 val1 之間
+        
+        const icon = items[Math.floor(Math.random() * items.length)];
+        
+        renderFruits('g1', val1, icon);
+        renderFruits('g2', val2, icon);
+        
+        document.getElementById('n1-text').innerText = val1;
+        document.getElementById('n2-text').innerText = val2;
+        document.getElementById('ans').value = '';
+        document.getElementById('feedback-text').innerText = '';
+    }
+
+    function renderFruits(id, count, icon) {
+        const container = document.getElementById(id);
+        container.innerHTML = '';
+        for(let i=0; i<count; i++) {
+            const span = document.createElement('span');
+            span.className = 'fruit-pop';
+            span.innerText = icon;
+            container.appendChild(span);
+        }
+        //soundPop.currentTime = 0;
+        //soundPop.play().catch(()=>{});
+    }
+
+    function check() {
+        const input = parseInt(document.getElementById('ans').value);
+        const feedback = document.getElementById('feedback-text');
+        
+        if(input === (val1 - val2)) {
+            successSound.play().catch(()=>{});
+            feedback.innerText = "Amazing! Subtraction Hero! ✨";
+            feedback.style.color = "#50fa7b";
+            setTimeout(refresh, 2000);
+        } else {
+            soundWrong.play().catch(()=>{});
+            feedback.innerText = "Try counting back! 🍎";
+            feedback.style.color = "#ff79c6";
+        }
+    }
+
+    refresh();
+</script>
+
+</body>
+</html>
