@@ -2,22 +2,23 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>數字大比拼 - 拖拉版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>數學大冒險</title>
     <style>
         body {
-            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
-            background-color: #fdfcf0;
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background: #fdf2f8; /* 柔和粉色系 */
+            margin: 0;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
+            touch-action: none;
             overflow: hidden;
         }
 
-         /* --- Home Button 樣式 --- */
+                 /* --- Home Button 樣式 --- */
         .home-btn {
             position: absolute;
             top: 20px;
@@ -44,96 +45,86 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
-        h1 { color: #16a34a; margin-bottom: 20px; }
-
-        .game-container {
-            background: white;
+        .container {
+            background: #2a2f4c;
             padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             text-align: center;
-            border: 4px solid #fde047;
+            width: 90%;
+            max-width: 600px;
         }
 
-        .numbers-display {
+        /* 數字顯示區 */
+        .game-display {
             display: flex;
+            justify-content: space-around;
             align-items: center;
-            gap: 30px;
-            font-size: 5rem;
+            margin-bottom: 50px;
+        }
+
+        .num-card {
+            width: 120px; height: 120px;
+            background: #f0f9ff;
+            border-radius: 25px;
+            font-size: 4rem;
             font-weight: bold;
-            margin-bottom: 40px;
+            color: #0369a1;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: inset 0 -5px 0 rgba(0,0,0,0.05);
         }
 
-        .num-box {
-            min-width: 120px;
-            padding: 20px;
-            background: #dcfce7;
+        .drop-zone {
+            width: 100px; height: 100px;
+            border: 4px dashed #cbd5e1;
             border-radius: 20px;
-            color: #15803d;
+            font-size: 3.5rem;
+            display: flex; align-items: center; justify-content: center;
+            background: #fafafa;
         }
 
-        /* 放答案的框框 */
-        .symbol-slot {
-            width: 120px;
-            height: 120px;
-            border: 5px dashed #cbd5e1;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f8fafc;
-            transition: all 0.3s;
-        }
-
-        /* 拖拉中框框變色 */
-        .symbol-slot.drag-over {
-            border-color: #22c55e;
-            background-color: #f0fdf4;
-            transform: scale(1.1);
-        }
-
-        /* 可拖動的符號區域 */
-        .symbols-palette {
+        /* 下方符號區 */
+        .symbol-list {
             display: flex;
             gap: 20px;
             justify-content: center;
-            margin-top: 20px;
+            height: 100px;
         }
 
-        .draggable-symbol {
-            font-size: 3.5rem;
-            width: 90px;
-            height: 90px;
-            background: #22c55e;
-            color: white;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: grab;
-            user-select: none;
-            box-shadow: 0 4px 0 #16a34a;
-        }
-
-        .draggable-symbol:active { cursor: grabbing; }
-
-        #message {
-            margin-top: 30px;
-            font-size: 1.8rem;
+        .drag-item {
+            width: 85px; height: 85px;
+            background: #4ade80;
+            color: black;
+            font-size: 3rem;
             font-weight: bold;
-            height: 2.2rem;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 20px;
+            cursor: pointer;
+            position: relative;
+            z-index: 10;
+            user-select: none;
+            box-shadow: 0 6px 0 #16a34a;
         }
 
-        .next-btn {
-            margin-top: 20px;
-            font-size: 1.2rem;
-            padding: 10px 25px;
-            background: #3b82f6;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            display: none;
+        /* 拖動中的樣子 */
+        .drag-item.active {
+            scale: 1.1;
+            opacity: 0.9;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        #msg { font-size: 1.8rem; font-weight: bold; margin-top: 30px; height: 1.5em; color: #16a34a; }
+        .next-btn { 
+            margin-top: 20px; padding: 15px 40px; background: #3b82f6; 
+            color: white; border: none; border-radius: 15px; font-size: 1.2rem;
+            display: none; cursor: pointer;
+        }
+
+        /* 手機適配 */
+        @media (max-width: 500px) {
+            .num-card { width: 80px; height: 80px; font-size: 2.5rem; }
+            .drop-zone { width: 70px; height: 70px; font-size: 2.2rem; }
+            .drag-item { width: 70px; height: 70px; font-size: 2.5rem; }
         }
     </style>
 </head>
@@ -142,107 +133,121 @@
 
 <body>
 
-    <h1>🐊 把正確的嘴巴拖進格子裡！</h1>
+    <h1 style="color: #be185d;">🐊 餵餵小鱷魚</h1>
 
-    <div class="game-container">
-        <div class="numbers-display">
-            <div id="numA" class="num-box">?</div>
-            <div id="targetSlot" class="symbol-slot" 
-                 ondragover="allowDrop(event)" 
-                 ondragleave="dragLeave(event)" 
-                 ondrop="drop(event)">?</div>
-            <div id="numB" class="num-box">?</div>
+    <div class="container">
+        <div class="game-display">
+            <div id="num1" class="num-card">?</div>
+            <div id="slot" class="drop-zone"></div>
+            <div id="num2" class="num-card">?</div>
         </div>
 
-        <p style="color: #64748b;">拖動下方的符號：</p>
-        
-        <div class="symbols-palette">
-            <div class="draggable-symbol" draggable="true" ondragstart="drag(event)" id="sym-lt">&lt;</div>
-            <div class="draggable-symbol" draggable="true" ondragstart="drag(event)" id="sym-eq">=</div>
-            <div class="draggable-symbol" draggable="true" ondragstart="drag(event)" id="sym-gt">&gt;</div>
+        <div class="symbol-list">
+            <div class="drag-item" onpointerdown="onStart(event)">&lt;</div>
+            <div class="drag-item" onpointerdown="onStart(event)">=</div>
+            <div class="drag-item" onpointerdown="onStart(event)">&gt;</div>
         </div>
 
-        <div id="message"></div>
-        <button id="nextBtn" class="next-btn" onclick="initGame()">下一題</button>
+        <div id="msg"></div>
+        <button id="next" class="next-btn" onclick="reset()">下一題 ➔</button>
     </div>
 
-    <script>
-        let valA, valB;
-        const correctSound = new Audio('https://cdn.pixabay.com/audio/2021/08/04/audio_0625c13f76.mp3');
+<script>
+    // --- 音效系統 ---
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    function beep(f, t, d) {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = t; o.frequency.value = f;
+        g.gain.setValueAtTime(0.1, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + d);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(); o.stop(ctx.currentTime + d);
+    }
+    const play = {
+        pop: () => beep(600, 'sine', 0.1),
+        win: () => { beep(523, 'sine', 0.2); setTimeout(()=>beep(659, 'sine', 0.2), 100); },
+        no: () => beep(200, 'square', 0.2)
+    };
 
-        function initGame() {
-            valA = Math.floor(Math.random() * 50) + 1;
-            valB = Math.floor(Math.random() * 50) + 1;
+    // --- 遊戲邏輯 ---
+    let n1, n2, cur = null, startPos = {x:0, y:0};
 
-            document.getElementById('numA').innerText = valA;
-            document.getElementById('numB').innerText = valB;
-            
-            const target = document.getElementById('targetSlot');
-            target.innerText = '?';
-            target.style.color = '#cbd5e1';
-            target.style.fontSize = '3rem';
-            
-            document.getElementById('message').innerText = '';
-            document.getElementById('nextBtn').style.display = 'none';
+    function reset() {
+        n1 = Math.floor(Math.random()*100)+1;
+        n2 = Math.floor(Math.random()*100)+1;
+        document.getElementById('num1').innerText = n1;
+        document.getElementById('num2').innerText = n2;
+        document.getElementById('slot').innerText = '';
+        document.getElementById('slot').style.background = '#fafafa';
+        document.getElementById('msg').innerText = '';
+        document.getElementById('next').style.display = 'none';
+        document.querySelectorAll('.drag-item').forEach(i => {
+            i.style.transform = 'translate(0,0)';
+            i.style.display = 'flex';
+        });
+    }
+
+    function onStart(e) {
+        if (ctx.state === 'suspended') ctx.resume();
+        cur = e.target;
+        startPos = { x: e.clientX, y: e.clientY };
+        cur.setPointerCapture(e.pointerId);
+        cur.classList.add('active');
+        cur.style.transition = 'none';
+        play.pop();
+    }
+
+    window.onpointermove = (e) => {
+        if (!cur) return;
+        const dx = e.clientX - startPos.x;
+        const dy = e.clientY - startPos.y;
+        cur.style.transform = `translate(${dx}px, ${dy}px)`;
+    };
+
+    window.onpointerup = (e) => {
+        if (!cur) return;
+        cur.classList.remove('active');
+        
+        const slot = document.getElementById('slot').getBoundingClientRect();
+        const me = cur.getBoundingClientRect();
+        
+        // 判定中心點碰撞
+        const cx = me.left + me.width/2;
+        const cy = me.top + me.height/2;
+
+        if (cx > slot.left && cx < slot.right && cy > slot.top && cy < slot.bottom) {
+            check(cur.innerText);
+        } else {
+            cur.style.transition = 'transform 0.3s cubic-bezier(0.5, 0, 0.5, 1.5)';
+            cur.style.transform = 'translate(0,0)';
         }
+        cur = null;
+    };
 
-        // 當開始拖動時，儲存符號內容
-        function drag(ev) {
-            ev.dataTransfer.setData("text", ev.target.innerText);
+    function check(val) {
+        const correct = n1 > n2 ? '>' : (n1 < n2 ? '<' : '=');
+        if (val === correct) {
+            play.win();
+            document.getElementById('slot').innerText = val;
+            document.getElementById('slot').style.background = '#fef08a';
+            document.getElementById('msg').innerText = '答對了！✨';
+            document.getElementById('next').style.display = 'inline-block';
+            document.querySelectorAll('.drag-item').forEach(i => i.style.display = 'none');
+        } else {
+            play.no();
+            document.getElementById('msg').innerText = '再試試看 😋';
+            cur.style.transition = 'transform 0.3s';
+            cur.style.transform = 'translate(0,0)';
         }
+    }
 
-        // 允許放置
-        function allowDrop(ev) {
-            ev.preventDefault();
-            ev.currentTarget.classList.add('drag-over');
-        }
+    function goHome() {
+        // 你可以根據需要修改跳轉網址，例如 index.html
+        window.location.href = "index.html"; 
+    }
 
-        // 離開放置區時恢復原狀
-        function dragLeave(ev) {
-            ev.currentTarget.classList.remove('drag-over');
-        }
-
-        // 放下時觸發判斷
-        function drop(ev) {
-            ev.preventDefault();
-            ev.currentTarget.classList.remove('drag-over');
-            
-            const playerChoice = ev.dataTransfer.getData("text");
-            checkAnswer(playerChoice);
-        }
-
-        function checkAnswer(choice) {
-            let correctSymbol;
-            if (valA > valB) correctSymbol = '>';
-            else if (valA < valB) correctSymbol = '<';
-            else correctSymbol = '=';
-
-            const messageEl = document.getElementById('message');
-            const target = document.getElementById('targetSlot');
-
-            if (choice === correctSymbol) {
-                correctSound.play();
-                target.innerText = choice;
-                target.style.color = '#ef4444';
-                target.style.fontSize = '5rem';
-                messageEl.innerText = "答對了！鱷魚吃飽了 🌟";
-                messageEl.style.color = "#16a34a";
-                document.getElementById('nextBtn').style.display = "inline-block";
-            } else {
-                messageEl.innerText = "哎呀，鱷魚不喜歡這個數字...再試試！";
-                messageEl.style.color = "#ef4444";
-                
-                // 答錯時晃動格子的視覺效果
-                target.style.borderColor = "#ef4444";
-                setTimeout(() => target.style.borderColor = "#cbd5e1", 500);
-            }
-        }
-        // Home 按鈕功能
-        function goHome() {
-            // 你可以根據需要修改跳轉網址，例如 index.html
-            window.location.href = "index.html"; 
-        }
-        initGame();
-    </script>
+    reset();
+</script>
 </body>
 </html>
