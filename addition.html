@@ -28,6 +28,33 @@
             color: var(--text-light);
         }
 
+         /* --- Home Button 樣式 --- */
+        .home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            cursor: pointer;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            text-decoration: none; /* 如果是連結的話 */
+        }
+
+        .home-btn:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
         .game-card {
             background: var(--card-bg);
             border-radius: 40px;
@@ -157,6 +184,8 @@
 </head>
 <body>
 
+<div class="home-btn" onclick="goHome()">🏠</div>
+
 <div class="game-card">
     <div class="score-board">✨ Points: <span id="score">0</span></div>
     <h1>數學</h1>
@@ -215,6 +244,12 @@
             fb.style.color = "#ffb86c"; // 柔和的橘色
         }
     }
+    // Home 按鈕功能
+    function goHome() {
+        // 你可以根據需要修改跳轉網址，例如 index.html
+        window.location.href = "index.html"; 
+    }
+
     init();
 </script>
 

@@ -17,6 +17,33 @@
             overflow: hidden;
         }
 
+         /* --- Home Button 樣式 --- */
+        .home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            cursor: pointer;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            text-decoration: none; /* 如果是連結的話 */
+        }
+
+        .home-btn:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
         h1 { color: #16a34a; margin-bottom: 20px; }
 
         .game-container {
@@ -110,6 +137,9 @@
         }
     </style>
 </head>
+
+<div class="home-btn" onclick="goHome()">🏠</div>
+
 <body>
 
     <h1>🐊 把正確的嘴巴拖進格子裡！</h1>
@@ -207,7 +237,11 @@
                 setTimeout(() => target.style.borderColor = "#cbd5e1", 500);
             }
         }
-
+        // Home 按鈕功能
+        function goHome() {
+            // 你可以根據需要修改跳轉網址，例如 index.html
+            window.location.href = "index.html"; 
+        }
         initGame();
     </script>
 </body>
